@@ -4,37 +4,47 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0a1020">
+<meta name="description" content="Les prédications du pasteur Francis Tinona : vidéo, audio et texte, même hors ligne.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Soleil Couchant">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Soleil Couchant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a1020;--bg2:#0f1830;--card:#131d36;--card2:#18243f;--line:#22304f;--text:#f2f4fa;--muted:#8d9ab8;--gold:#e9b24c;--gold2:#f6cf7d;--ink:#1a1204}
+:root{--bg:#0a1020;--bg2:#0f1830;--card:#131d36;--card2:#18243f;--line:#22304f;--text:#f2f4fa;--muted:#8d9ab8;--gold:#e9b24c;--gold2:#f6cf7d;--ink:#1a1204;--ok:#5ac28a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 body{min-height:100vh}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+button:disabled{opacity:.45;cursor:default}
 .serif{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:600;color:var(--gold)}
 #app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:calc(150px + env(safe-area-inset-bottom));background:radial-gradient(120% 40% at 50% 0%,#18274a 0%,var(--bg) 70%)}
-.pad{padding:0 18px}
 header.top{padding:calc(18px + env(safe-area-inset-top)) 18px 6px;display:flex;align-items:center;gap:12px}
 .logo{width:38px;height:38px;flex:none}
 header.top h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px}
 header.top small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
 h2.sec{font-size:17px;margin:26px 18px 12px;display:flex;justify-content:space-between;align-items:baseline;font-weight:700}
-h2.sec a,h2.sec button{font-size:13px;color:var(--gold);font-weight:600}
-.btn{background:var(--gold);color:var(--ink);font-weight:700;padding:11px 18px;border-radius:999px;font-size:14px}
+h2.sec button{font-size:13px;color:var(--gold);font-weight:600}
+.btn{background:var(--gold);color:var(--ink);font-weight:700;padding:11px 18px;border-radius:999px;font-size:14px;text-decoration:none;display:inline-block}
 .btn.ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
-.btn.block{display:block;width:100%;padding:14px}
-/* hero */
-.hero{margin:14px 18px 0;border-radius:22px;overflow:hidden;position:relative;background:var(--card);border:1px solid var(--line)}
+#offline{display:none;background:#3a2a0c;color:var(--gold2);font-size:12.5px;text-align:center;padding:calc(6px + env(safe-area-inset-top)) 10px 6px;font-weight:600}
+body.off #offline{display:block}
+.install{margin:14px 18px 0;background:linear-gradient(120deg,#2a1d08,#14203a);border:1px solid #e9b24c55;border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:center}
+.install p{margin:0;font-size:13px;line-height:1.45;flex:1;color:#e9dcc0}
+.install .x{color:var(--muted);padding:6px;font-size:16px}
+.hero{margin:14px 18px 0;border-radius:22px;overflow:hidden;position:relative;background:var(--card);border:1px solid var(--line);cursor:pointer}
 .hero .img{aspect-ratio:16/9;background-size:cover;background-position:center;background-color:#1b2a4d}
 .hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,#0a102000 30%,#0a1020ee 100%)}
 .hero .in{position:absolute;left:16px;right:16px;bottom:14px}
 .hero .tag{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold2);font-weight:700}
 .hero .ht{font-size:18px;font-weight:700;line-height:1.25;margin:4px 0 10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hero .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px}
-.hero .btn svg,.btn svg{width:16px;height:16px;fill:currentColor}
-/* horizontal cards */
+.btn svg{width:16px;height:16px;fill:currentColor}
 .hscroll{display:flex;gap:12px;overflow-x:auto;padding:0 18px 4px;scroll-snap-type:x mandatory;scrollbar-width:none}
 .hscroll::-webkit-scrollbar{display:none}
 .hcard{flex:none;width:210px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;scroll-snap-align:start;text-align:left}
@@ -43,15 +53,17 @@ h2.sec a,h2.sec button{font-size:13px;color:var(--gold);font-weight:600}
 .prog{height:3px;background:#0006;border-radius:3px;overflow:hidden}
 .prog i{display:block;height:100%;background:var(--gold)}
 .hcard .rs{font-size:11px;color:var(--muted);margin-top:6px}
-/* rows */
 .list{padding:0 18px;display:flex;flex-direction:column;gap:6px}
 .row{display:flex;gap:12px;align-items:center;padding:8px;border-radius:14px;cursor:pointer}
 .row:active{background:var(--card)}
 .row.cur{background:var(--card2);box-shadow:inset 0 0 0 1px #e9b24c55}
-.row .th{width:84px;height:48px;border-radius:9px;flex:none;background-size:cover;background-position:center;background-color:#1b2a4d;position:relative}
+.row .th{width:84px;height:48px;border-radius:9px;flex:none;background-size:cover;background-position:center;background-color:#1b2a4d;position:relative;display:grid;place-items:center}
+.row .th .sunmini{width:26px;opacity:.55}
 .row .rm{flex:1;min-width:0}
 .row .rt{font-size:14px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.row .rs{font-size:12px;color:var(--muted);margin-top:3px}
+.row .rs{font-size:12px;color:var(--muted);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tg{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:1px 6px;border-radius:6px;background:#ffffff12;color:#b9c4de}
+.tg.ok{background:#5ac28a22;color:var(--ok)}
 .row .ic{padding:8px;color:var(--muted);flex:none}
 .row .ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
 .row .ic.on{color:var(--gold)}.row .ic.on svg{fill:var(--gold)}
@@ -62,29 +74,24 @@ h2.sec a,h2.sec button{font-size:13px;color:var(--gold);font-weight:600}
 .empty{text-align:center;color:var(--muted);padding:44px 28px;line-height:1.6;font-size:14px}
 .empty .big{font-size:26px;margin-bottom:6px;display:block}
 .empty .btn{margin-top:18px}
-/* search */
 .search{margin:18px;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0 14px}
 .search svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;flex:none}
 .search input{flex:1;background:none;border:0;outline:0;color:var(--text);font:inherit;padding:14px 0;font-size:15px}
-/* library tiles */
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px}
 .tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:left}
 .tile .ti{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;margin-bottom:10px}
 .tile .ti svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2}
 .tile b{display:block;font-size:14px}.tile small{color:var(--muted);font-size:12px}
 .tile.off{opacity:.5}
-/* settings */
 .set{margin:0 18px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
-.set button,.set .it{display:flex;justify-content:space-between;align-items:center;width:100%;padding:15px 16px;border-bottom:1px solid var(--line);font-size:14px;text-align:left}
+.set button,.set .it{display:flex;justify-content:space-between;align-items:center;width:100%;padding:15px 16px;border-bottom:1px solid var(--line);font-size:14px;text-align:left;gap:10px}
 .set>*:last-child{border-bottom:0}
-.set span.v{color:var(--muted);font-size:13px}
+.set span.v{color:var(--muted);font-size:13px;text-align:right}
 .about{margin:22px 18px;color:var(--muted);font-size:13px;line-height:1.6;text-align:center}
-/* tab bar */
 nav.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,520px);display:flex;background:#0b1326f2;backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:20}
 nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);padding:4px 0;font-weight:500}
 nav.tabs button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 nav.tabs button.on{color:var(--gold)}
-/* mini player */
 #mini{position:fixed;left:50%;transform:translateX(-50%);width:min(calc(100% - 20px),500px);bottom:calc(68px + env(safe-area-inset-bottom));background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:8px 10px;display:none;align-items:center;gap:10px;z-index:19;box-shadow:0 10px 30px #0009;overflow:hidden}
 #mini .th{width:44px;height:44px;border-radius:9px;background-size:cover;background-position:center;background-color:#1b2a4d;flex:none}
 #mini .tt{flex:1;min-width:0;text-align:left}
@@ -94,7 +101,6 @@ nav.tabs button.on{color:var(--gold)}
 #mini .bar i{display:block;height:100%;width:0;background:var(--gold)}
 .round{width:42px;height:42px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center;flex:none}
 .round svg{width:20px;height:20px;fill:currentColor}
-/* full player */
 #full{position:fixed;inset:0;z-index:40;background:linear-gradient(180deg,#1b2b52 0%,#0a1020 55%);transform:translateY(100%);transition:transform .3s;overflow-y:auto;visibility:hidden}
 #full.open{transform:none;visibility:visible}
 #full .wrap{max-width:520px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 18px calc(30px + env(safe-area-inset-bottom))}
@@ -102,10 +108,16 @@ nav.tabs button.on{color:var(--gold)}
 .ptop .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#ffffff12}
 .ptop .ic svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2}
 .ptop span{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);font-weight:700}
-#media{margin:18px 0 16px;border-radius:20px;overflow:hidden;background:#000;aspect-ratio:16/9;width:100%;box-shadow:0 16px 40px #0008}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px;margin:14px 0 0}
+.seg button{flex:1;padding:8px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--gold);color:var(--ink)}
+#media{margin:14px 0 16px;border-radius:20px;overflow:hidden;background:#000;aspect-ratio:16/9;width:100%;box-shadow:0 16px 40px #0008}
 #media iframe{width:100%;height:100%;border:0}
-.cover{height:100%;display:grid;place-items:center;background:radial-gradient(circle at 50% 75%,#e9b24c,#7a4a12 50%,#0f1830)}
-.cover svg{width:90px;height:90px}
+.cover{height:100%;display:grid;place-items:center;background:radial-gradient(circle at 50% 75%,#e9b24c,#7a4a12 50%,#0f1830);background-size:cover;background-position:center;position:relative}
+.cover.img::after{content:"";position:absolute;inset:0;background:#0a1020b8}
+.cover svg,.cover span{position:relative;z-index:1}
+.cover svg{width:84px;height:84px}
+.cover span{position:absolute;bottom:12px;font-size:12px;color:#fff;font-weight:600;letter-spacing:.5px}
 #ftitle{font-size:20px;line-height:1.3;margin:0 0 4px;font-weight:700}
 #fsub{color:var(--muted);font-size:13px;margin-bottom:16px}
 input[type=range]{width:100%;accent-color:var(--gold);margin:0}
@@ -119,21 +131,30 @@ input[type=range]{width:100%;accent-color:var(--gold);margin:0}
 .chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600}
 .chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold)}
 .chip.on{border-color:var(--gold);color:var(--gold2)}
-.chip.fav::before{display:none}
+.chip.nodot::before{display:none}
+.chip.ok{border-color:#5ac28a88;color:var(--ok)}
+.tx{margin-top:18px;background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:14px 8px 10px 14px}
+.txh{display:flex;justify-content:space-between;align-items:center;margin:0 6px 8px 0}
+.txh h3{margin:0;font-size:15px}
+.txh button{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:5px 10px;font-size:13px;font-weight:700;margin-left:6px}
+#txBody{max-height:46vh;overflow:auto;font-size:var(--txs,16px);line-height:1.7;padding-right:8px;color:#dfe5f4}
+#txBody p{margin:0 0 .55em;padding:2px 6px;border-radius:8px}
+#txBody p.cue{cursor:pointer}
+#txBody p.on{background:#e9b24c22;color:var(--gold2)}
 .queue{margin-top:20px;background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:14px 8px 8px}
 .queue h3{margin:0 10px 8px;font-size:15px}
 .note{font-size:11.5px;color:var(--muted);text-align:center;margin:16px 10px 0;line-height:1.5}
-/* dialog */
 dialog{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:22px;padding:20px;width:min(92vw,440px)}
 dialog::backdrop{background:#000b}
 dialog h3{margin:0 0 6px}
 dialog p{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.5}
 dialog textarea{width:100%;min-height:130px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit;font-size:14px;resize:vertical}
 dialog .row2{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
-#toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--gold);color:var(--ink);font-weight:700;font-size:13px;padding:10px 16px;border-radius:999px;z-index:60;display:none}
+#toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--gold);color:var(--ink);font-weight:700;font-size:13px;padding:10px 16px;border-radius:999px;z-index:60;display:none;max-width:92vw;text-align:center}
 </style>
 </head>
 <body>
+<div id="offline">Hors ligne : seules les prédications téléchargées sont disponibles</div>
 <div id="app"></div>
 <div id="mini">
   <button class="th" id="miniTh" aria-label="Ouvrir le lecteur"></button>
@@ -148,6 +169,9 @@ dialog .row2{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
     <button class="ic" id="close" aria-label="Réduire"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
     <span>Prédication</span>
     <span style="width:40px"></span>
+  </div>
+  <div class="seg" id="seg" hidden>
+    <button id="segAudio">Audio</button><button id="segVideo">Vidéo</button><button id="segText">Texte</button>
   </div>
   <div id="media"></div>
   <h2 id="ftitle"></h2>
@@ -165,7 +189,12 @@ dialog .row2{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
     <button class="chip" id="rate">Vitesse 1x</button>
     <button class="chip" id="sleep">Minuteur</button>
     <button class="chip" id="rep">Répéter</button>
-    <button class="chip fav" id="favBtn">♡ Favori</button>
+    <button class="chip nodot" id="favBtn">♡ Favori</button>
+    <button class="chip nodot" id="dlBtn" hidden>⤓ Télécharger</button>
+  </div>
+  <div class="tx" id="txBox" hidden>
+    <div class="txh"><h3>Transcription</h3><div><button id="txMinus" aria-label="Réduire le texte">A−</button><button id="txPlus" aria-label="Agrandir le texte">A+</button></div></div>
+    <div id="txBody"></div>
   </div>
   <div class="queue"><h3>À écouter ensuite</h3><div class="list" id="queue"></div></div>
   <p class="note" id="note"></p>
@@ -173,8 +202,8 @@ dialog .row2{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
 
 <dialog id="dlg">
   <h3>Ajouter des prédications</h3>
-  <p>Colle un lien YouTube par ligne. Le titre est récupéré automatiquement ; tu peux aussi l'écrire après le lien.</p>
-  <textarea id="urls" placeholder="https://www.youtube.com/watch?v=...&#10;https://youtu.be/..."></textarea>
+  <p>Colle un lien YouTube par ligne. Le titre est récupéré automatiquement ; tu peux aussi l'écrire après le lien. Ces ajouts restent sur ton téléphone.</p>
+  <textarea id="urls" placeholder="https://www.youtube.com/watch?v=...&#10;https://youtu.be/... Titre de la prédication"></textarea>
   <div class="row2"><button class="btn ghost" id="cancel">Annuler</button><button class="btn" id="save">Ajouter</button></div>
 </dialog>
 <div id="toast"></div>
@@ -188,17 +217,44 @@ const LS = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d } catch { return d } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} }
 };
+const abs = u => new URL(u, location.href).href;
+const online = () => navigator.onLine !== false;
 
-/* ---------- DONNÉES ----------
-   { id, title, yt }  -> prédication YouTube
-   { id, title, audio } -> fichier mp3 hébergé (plus tard : voix ElevenLabs, autres langues)
-   Tu peux pré-remplir ici, sinon on ajoute depuis l'appli. */
-const DEFAULT_SERMONS = [];
-let sermons = LS.get('sc_sermons', null) ?? DEFAULT_SERMONS;
+/* ---------- CATALOGUE ----------
+   sermons.json (partagé par tout le monde) : { "sermons": [ { id, title, date, yt, audio, transcript } ] }
+   + les liens YouTube ajoutés par la personne sur son téléphone (« local »). */
+let catalog = LS.get('sc_catalog', []);
+let local = LS.get('sc_local', null) ?? LS.get('sc_sermons', []);
+let sermons = [];
 let favs = LS.get('sc_favs', []);
 let history = LS.get('sc_hist', []);
-let settings = LS.get('sc_set', { rate: 1 });
-const saveAll = () => { LS.set('sc_sermons', sermons); LS.set('sc_favs', favs); LS.set('sc_hist', history); LS.set('sc_set', settings); };
+let settings = LS.get('sc_set', { rate: 1, txs: 16 });
+let dl = LS.get('sc_dl', {});          // id -> octets téléchargés (audio)
+let txtOk = LS.get('sc_txt', {});      // id -> transcription gardée hors ligne
+let dlProg = {};                        // id -> 0..1 pendant un téléchargement
+const saveAll = () => { LS.set('sc_local', local); LS.set('sc_favs', favs); LS.set('sc_hist', history); LS.set('sc_set', settings); LS.set('sc_dl', dl); LS.set('sc_txt', txtOk); };
+
+const ytId = u => { const m = String(u || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(String(u || '')) ? u : null); };
+function normalize(s) {
+  const yt = ytId(s.yt);
+  const id = String(s.id || yt || s.audio || s.title);
+  return { id, title: s.title || 'Prédication', date: s.date || '', yt, audio: s.audio || '', transcript: s.transcript || '', local: !!s.local };
+}
+function rebuild() {
+  const seen = new Set();
+  sermons = [...local.map(s => ({ ...s, local: true })), ...catalog].map(normalize).filter(s => !seen.has(s.id) && seen.add(s.id));
+}
+async function loadCatalog() {
+  try {
+    const r = await fetch('sermons.json', { cache: 'no-cache' });
+    if (!r.ok) throw 0;
+    const j = await r.json();
+    catalog = (Array.isArray(j) ? j : j.sermons) || [];
+    LS.set('sc_catalog', catalog);
+  } catch {}
+  rebuild(); render();
+}
+rebuild();
 
 const I = {
   play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
@@ -212,7 +268,7 @@ const I = {
   dl: '<svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>',
   list: '<svg viewBox="0 0 24 24"><path d="M4 6h12M4 12h12M4 18h8M19 15v6m-3-3h6"/></svg>'
 };
-const SUN = '<svg viewBox="0 0 64 64"><circle cx="32" cy="38" r="20" fill="#f6cf7d"/><rect y="40" width="64" height="24" fill="#0f1830"/></svg>';
+const SUN = '<svg viewBox="0 0 64 64"><path d="M10 40a22 22 0 0 1 44 0z" fill="#f6cf7d"/><path d="M8 46h48M16 52h32M24 58h16" stroke="#f6cf7d" stroke-width="3" stroke-linecap="round"/></svg>';
 const LOGO = '<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6cf7d"/><stop offset="1" stop-color="#e08a2c"/></linearGradient></defs><circle cx="32" cy="36" r="20" fill="url(#lg)"/><rect y="38" width="64" height="26" fill="#0a1020"/><path d="M8 43h48M15 50h34M23 57h18" stroke="#e9b24c" stroke-width="3" stroke-linecap="round"/></svg>';
 
 const fmt = s => {
@@ -220,83 +276,120 @@ const fmt = s => {
   const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60;
   return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(r).padStart(2, '0');
 };
-const ytId = u => { const m = String(u).match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([\w-]{11})/); return m ? m[1] : null; };
-const thumb = s => s.yt ? `style="background-image:url('https://i.ytimg.com/vi/${s.yt}/mqdefault.jpg')"` : '';
+const mb = b => b >= 1e9 ? (b / 1e9).toFixed(1) + ' Go' : Math.max(1, Math.round(b / 1e6)) + ' Mo';
+const thumbStyle = s => s.yt ? `style="background-image:url('https://i.ytimg.com/vi/${s.yt}/mqdefault.jpg')"` : '';
 const pos = id => LS.get('sc_pos_' + id, 0);
 const dur = id => LS.get('sc_dur_' + id, 0);
 const pct = id => { const d = dur(id), p = pos(id); return d ? Math.min(100, p / d * 100) : 0; };
 const byId = id => sermons.find(s => s.id === id);
-function toast(t) { const el = $('#toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => el.style.display = 'none', 2200); }
+const isDl = id => dl[id] != null;
+function toast(t) { const el = $('#toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => el.style.display = 'none', 2600); }
 
 /* ---------- ÉTAT & NAVIGATION ---------- */
 let tab = 'home', query = '', libView = null;
-let current = null, engine = null, playing = false, repeat = false, sleepAt = 0, sleepI = 0;
+let current = null, engine = null, mode = null, playing = false, repeat = false, sleepAt = 0, sleepI = 0;
 const RATES = [1, 1.25, 1.5, 0.75];
 const TABS = [['home', 'Accueil', I.home], ['search', 'Recherche', I.search], ['lib', 'Bibliothèque', I.lib], ['set', 'Réglages', I.gear]];
-
 function renderTabs() {
   $('#tabs').innerHTML = TABS.map(([k, l, ic]) => `<button data-tab="${k}" class="${tab === k ? 'on' : ''}">${ic}<span>${l}</span></button>`).join('');
 }
 
+/* installation (PWA) */
+let installEvt = null;
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; render(); });
+addEventListener('appinstalled', () => { installEvt = null; toast('Application installée'); render(); });
+async function install() {
+  if (installEvt) { installEvt.prompt(); try { await installEvt.userChoice } catch {} installEvt = null; render(); }
+  else if (isIOS) toast('Appuie sur Partager, puis « Sur l\'écran d\'accueil »');
+  else toast('Ouvre le menu du navigateur, puis « Installer l\'application »');
+}
+function installBanner() {
+  if (standalone() || LS.get('sc_noinstall', false)) return '';
+  if (!installEvt && !isIOS) return '';
+  const txt = isIOS ? 'Installe Soleil Couchant : appuie sur <b>Partager</b>, puis <b>Sur l\'écran d\'accueil</b>.' : 'Installe Soleil Couchant sur ton téléphone pour l\'ouvrir comme une application.';
+  return `<div class="install"><p>${txt}</p>${installEvt ? '<button class="btn" data-act="install">Installer</button>' : ''}<button class="x" data-act="noinstall" aria-label="Fermer">✕</button></div>`;
+}
+
+function tags(s) {
+  let t = '';
+  if (isDl(s.id)) t += '<span class="tg ok">Hors ligne</span>';
+  else if (dlProg[s.id] != null) t += `<span class="tg">${Math.round(dlProg[s.id] * 100)}%</span>`;
+  if (s.audio) t += '<span class="tg">Audio</span>';
+  if (s.yt) t += '<span class="tg">Vidéo</span>';
+  if (s.transcript) t += '<span class="tg">Texte</span>';
+  return t;
+}
 function row(s, extra = '') {
   const isCur = current && current.id === s.id;
   const p = pct(s.id);
-  const sub = extra && isCur ? extra : (p > 1 && p < 98 ? `Reprendre à ${fmt(pos(s.id))}` : PASTOR);
+  const sub = extra && isCur ? `<span>${esc(extra)}</span>` : (p > 1 && p < 98 ? `<span>Reprendre à ${fmt(pos(s.id))}</span>` : tags(s) || `<span>${PASTOR}</span>`);
+  const th = s.yt ? thumbStyle(s) : '';
   return `<div class="row ${isCur ? 'cur' : ''}" data-play="${esc(s.id)}">
-    <div class="th" ${thumb(s)}>${isCur && playing ? '<div class="eq"><i></i><i></i><i></i></div>' : ''}</div>
-    <div class="rm"><div class="rt">${esc(s.title)}</div><div class="rs">${esc(sub)}</div></div>
+    <div class="th" ${th}>${!s.yt ? `<span class="sunmini">${SUN}</span>` : ''}${isCur && playing ? '<div class="eq"><i></i><i></i><i></i></div>' : ''}</div>
+    <div class="rm"><div class="rt">${esc(s.title)}</div><div class="rs">${sub}</div></div>
     <button class="ic ${favs.includes(s.id) ? 'on' : ''}" data-fav="${esc(s.id)}" aria-label="Favori">${I.heart}</button></div>`;
 }
-const emptyBlock = `<div class="empty"><span class="big serif">Aucune prédication</span>Ajoute les liens YouTube des prédications du pasteur pour commencer à les écouter.<br><button class="btn" data-act="add">+ Ajouter des prédications</button></div>`;
+const emptyBlock = `<div class="empty"><span class="big serif">Aucune prédication</span>Les prédications du pasteur apparaîtront ici dès qu'elles seront ajoutées au catalogue. Tu peux déjà ajouter un lien YouTube sur ton téléphone.<br><button class="btn" data-act="add">+ Ajouter un lien YouTube</button></div>`;
 
 function viewHome() {
-  let h = `<header class="top">${LOGO}<div><h1>Soleil Couchant</h1><small>${PASTOR}</small></div></header>`;
+  let h = `<header class="top">${LOGO}<div><h1>Soleil Couchant</h1><small>${PASTOR}</small></div></header>` + installBanner();
   if (!sermons.length) return h + emptyBlock;
   const latest = sermons[0];
-  h += `<div class="hero" data-play="${esc(latest.id)}" style="cursor:pointer"><div class="img" ${thumb(latest)}></div><div class="shade"></div>
+  h += `<div class="hero" data-play="${esc(latest.id)}"><div class="img" ${thumbStyle(latest)}></div><div class="shade"></div>
     <div class="in"><div class="tag">Dernière prédication</div><div class="ht">${esc(latest.title)}</div><span class="btn">${I.play} Écouter</span></div></div>`;
   const cont = sermons.filter(s => pct(s.id) > 1 && pct(s.id) < 98 && pos(s.id) > 5);
   if (cont.length) {
     h += `<h2 class="sec"><span>Continuer l'<span class="serif">écoute</span></span></h2><div class="hscroll">` +
-      cont.map(s => `<button class="hcard" data-play="${esc(s.id)}"><div class="th" ${thumb(s)}></div><div class="rt">${esc(s.title)}</div><div class="prog"><i style="width:${pct(s.id)}%"></i></div><div class="rs">Reprendre à ${fmt(pos(s.id))}</div></button>`).join('') + '</div>';
+      cont.map(s => `<button class="hcard" data-play="${esc(s.id)}"><div class="th" ${thumbStyle(s)}></div><div class="rt">${esc(s.title)}</div><div class="prog"><i style="width:${pct(s.id)}%"></i></div><div class="rs">Reprendre à ${fmt(pos(s.id))}</div></button>`).join('') + '</div>';
   }
   h += `<h2 class="sec"><span><span class="serif">Nouveautés</span></span><button data-tab="search">Voir tout</button></h2><div class="list">${sermons.slice(0, 8).map(s => row(s)).join('')}</div>`;
   return h;
 }
-function viewSearch() {
+function searchResults() {
   const q = query.trim().toLowerCase();
   const res = q ? sermons.filter(s => s.title.toLowerCase().includes(q)) : sermons;
+  return res.length ? res.map(s => row(s)).join('') : (sermons.length ? '<div class="empty">Aucun résultat.</div>' : emptyBlock);
+}
+function viewSearch() {
   return `<header class="top">${LOGO}<div><h1>Recherche</h1><small>${sermons.length} prédication${sermons.length > 1 ? 's' : ''}</small></div></header>
     <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" type="search" placeholder="Un titre, un thème…" value="${esc(query)}" autocomplete="off"></div>
-    <div class="list" id="results">${res.length ? res.map(s => row(s)).join('') : (sermons.length ? '<div class="empty">Aucun résultat.</div>' : emptyBlock)}</div>`;
+    <div class="list" id="results">${searchResults()}</div>`;
 }
 function viewLib() {
   if (libView) {
-    const ids = libView === 'fav' ? favs : history;
+    const ids = libView === 'fav' ? favs : libView === 'dl' ? Object.keys(dl) : history;
     const items = ids.map(byId).filter(Boolean);
-    return `<header class="top"><button class="btn ghost" data-act="libback">‹ Retour</button><h1 style="margin-left:6px">${libView === 'fav' ? 'Favoris' : 'Historique'}</h1></header>
+    const title = { fav: 'Favoris', hist: 'Historique', dl: 'Téléchargements' }[libView];
+    return `<header class="top"><button class="btn ghost" data-act="libback">‹ Retour</button><h1 style="margin-left:6px">${title}</h1></header>
       <div class="list" style="margin-top:12px">${items.length ? items.map(s => row(s)).join('') : '<div class="empty">Rien ici pour le moment.</div>'}</div>`;
   }
   const cont = sermons.filter(s => pct(s.id) > 1 && pct(s.id) < 98 && pos(s.id) > 5);
+  const nDl = Object.keys(dl).filter(byId).length;
   return `<header class="top">${LOGO}<div><h1>Bibliothèque</h1><small>Ton espace d'écoute</small></div></header>
     <div class="tiles" style="margin-top:14px">
       <button class="tile" data-lib="fav"><div class="ti" style="background:#e0556b">${I.heart.replace('<svg', '<svg style="fill:#fff"')}</div><b>Favoris</b><small>${favs.filter(byId).length} contenu(s)</small></button>
       <button class="tile" data-lib="hist"><div class="ti" style="background:#3b82c4">${I.hist}</div><b>Historique</b><small>${history.filter(byId).length} écoute(s)</small></button>
-      <button class="tile off" data-act="soon"><div class="ti" style="background:#d08a2e">${I.dl}</div><b>Téléchargements</b><small>Bientôt</small></button>
+      <button class="tile" data-lib="dl"><div class="ti" style="background:#d08a2e">${I.dl}</div><b>Téléchargements</b><small>${nDl} hors ligne</small></button>
       <button class="tile off" data-act="soon"><div class="ti" style="background:#2fa37a">${I.list}</div><b>Playlists</b><small>Bientôt</small></button>
     </div>
     <h2 class="sec"><span>Continuer l'<span class="serif">écoute</span></span></h2>
     <div class="list">${cont.length ? cont.map(s => row(s)).join('') : '<div class="empty" style="padding:20px">Tes écoutes en cours apparaîtront ici.</div>'}</div>`;
 }
 function viewSet() {
+  const total = Object.values(dl).reduce((a, b) => a + (b || 0), 0);
   return `<header class="top">${LOGO}<div><h1>Réglages</h1><small>Soleil Couchant</small></div></header>
     <div class="set" style="margin-top:14px">
-      <button data-act="add"><span>Ajouter des prédications</span><span class="v">+</span></button>
+      ${standalone() ? '<div class="it"><span>Application installée</span><span class="v">✓</span></div>' : `<button data-act="install"><span>Installer l'application</span><span class="v">Installer</span></button>`}
       <button data-act="rate"><span>Vitesse de lecture par défaut</span><span class="v">${settings.rate}x</span></button>
+      <button data-act="add"><span>Ajouter un lien YouTube</span><span class="v">+</span></button>
       <button data-act="channel"><span>Chaîne YouTube du pasteur</span><span class="v">Ouvrir ↗</span></button>
-      <button data-act="clear"><span style="color:#ff8f8f">Vider la liste</span></button>
+      <div class="it"><span>Téléchargements</span><span class="v">${Object.keys(dl).length} · ${mb(total)}</span></div>
+      <button data-act="cleardl"><span style="color:#ff8f8f">Supprimer les téléchargements</span></button>
+      <button data-act="clear"><span style="color:#ff8f8f">Retirer mes liens ajoutés</span></button>
     </div>
-    <p class="about"><span class="serif" style="font-size:20px">Soleil Couchant Tabernacle</span><br>Les prédications du ${PASTOR}, à écouter où que tu sois.<br>Version 1 · Français</p>`;
+    <p class="about"><span class="serif" style="font-size:20px">Soleil Couchant Tabernacle</span><br>Les prédications du ${PASTOR}, en vidéo, en audio et en texte, même sans réseau.<br>Version 3 · Français</p>`;
 }
 function render() {
   const keepQ = document.activeElement && document.activeElement.id === 'q';
@@ -319,20 +412,90 @@ document.addEventListener('click', e => {
   if (a) {
     const k = a.dataset.act;
     if (k === 'add') openDialog();
+    else if (k === 'install') install();
+    else if (k === 'noinstall') { LS.set('sc_noinstall', true); render(); }
     else if (k === 'libback') { libView = null; render(); }
     else if (k === 'soon') toast('Bientôt disponible');
     else if (k === 'rate') { settings.rate = RATES[(RATES.indexOf(settings.rate) + 1) % RATES.length]; saveAll(); render(); }
     else if (k === 'channel') window.open(CHANNEL, '_blank', 'noopener');
-    else if (k === 'clear' && confirm('Vider toute la liste de prédications ?')) { stopAll(); sermons = []; favs = []; history = []; saveAll(); render(); }
+    else if (k === 'cleardl') { if (confirm('Supprimer tous les téléchargements ?')) clearDownloads(); }
+    else if (k === 'clear') { if (confirm('Retirer les liens que tu as ajoutés ?')) { if (current && current.local) stopAll(); local = []; favs = favs.filter(byId); saveAll(); rebuild(); render(); } }
   }
 });
 document.addEventListener('input', e => {
-  if (e.target.id === 'q') { query = e.target.value; const q = query.trim().toLowerCase(); const res = q ? sermons.filter(s => s.title.toLowerCase().includes(q)) : sermons; $('#results').innerHTML = res.length ? res.map(s => row(s)).join('') : '<div class="empty">Aucun résultat.</div>'; }
+  if (e.target.id === 'q') { query = e.target.value; $('#results').innerHTML = searchResults(); }
 });
 function toggleFav(id) {
   favs = favs.includes(id) ? favs.filter(x => x !== id) : [id, ...favs];
   saveAll(); render(); renderQueue(); updateFavBtn();
 }
+function syncOnline() { document.body.classList.toggle('off', !online()); updateSeg(); }
+addEventListener('online', () => { syncOnline(); loadCatalog(); });
+addEventListener('offline', syncOnline);
+
+/* ---------- TÉLÉCHARGEMENT HORS LIGNE ---------- */
+async function getText(item) {
+  const url = abs(item.transcript);
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw 0;
+    const t = await r.text();
+    try { const c = await caches.open('sc-text'); await c.put(url, new Response(t)); } catch {}
+    if (!txtOk[item.id]) { txtOk[item.id] = 1; saveAll(); }
+    return t;
+  } catch {
+    try { const c = await caches.open('sc-text'); const m = await c.match(url); if (m) return await m.text(); } catch {}
+    return null;
+  }
+}
+async function download(item) {
+  if (!item.audio || dlProg[item.id] != null) return;
+  if (!online()) { toast('Connecte-toi à internet pour télécharger'); return; }
+  dlProg[item.id] = 0; refreshDl();
+  try {
+    try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
+    const url = abs(item.audio);
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const total = +r.headers.get('content-length') || 0;
+    const reader = r.body.getReader(); const chunks = []; let got = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value); got += value.length;
+      dlProg[item.id] = total ? got / total : 0.5; refreshDl();
+    }
+    const type = r.headers.get('content-type') || 'audio/mpeg';
+    const blob = new Blob(chunks, { type });
+    const c = await caches.open('sc-audio');
+    await c.put(url, new Response(blob, { headers: { 'content-type': type, 'content-length': String(blob.size) } }));
+    if (item.transcript) await getText(item);
+    dl[item.id] = blob.size; saveAll();
+    toast('Disponible hors ligne');
+  } catch (err) {
+    toast('Téléchargement impossible, réessaie avec une meilleure connexion');
+  }
+  delete dlProg[item.id]; refreshDl(); render();
+}
+async function removeDl(item) {
+  try { const c = await caches.open('sc-audio'); await c.delete(abs(item.audio)); } catch {}
+  delete dl[item.id]; saveAll(); refreshDl(); render();
+  toast('Téléchargement supprimé');
+}
+async function clearDownloads() {
+  try { await caches.delete('sc-audio'); } catch {}
+  dl = {}; saveAll(); refreshDl(); render();
+}
+function refreshDl() {
+  const b = $('#dlBtn');
+  if (!current || !current.audio) { b.hidden = true; return; }
+  b.hidden = false;
+  const p = dlProg[current.id];
+  b.classList.toggle('ok', isDl(current.id));
+  b.textContent = p != null ? `⤓ ${Math.round(p * 100)} %` : isDl(current.id) ? '✓ Hors ligne · Retirer' : '⤓ Télécharger';
+  b.disabled = p != null;
+}
+$('#dlBtn').onclick = () => { if (!current) return; isDl(current.id) ? removeDl(current) : download(current); };
 
 /* ---------- MOTEURS DE LECTURE ---------- */
 let ytReady = false, ytQueue = [];
@@ -363,14 +526,30 @@ function makeYT(item, start) {
     ytReady ? go() : (loadYT(), ytQueue.push(go));
   });
 }
-function makeAudio(item, start) {
-  const a = new Audio(item.audio);
+async function audioSource(item) {
+  const url = abs(item.audio);
+  if (isDl(item.id)) {
+    try {
+      const c = await caches.open('sc-audio'); const m = await c.match(url);
+      if (m) return { src: URL.createObjectURL(await m.blob()), blob: true };
+    } catch {}
+  }
+  return { src: url, blob: false };
+}
+let blobUrl = null;
+async function makeAudio(item, start) {
+  const { src, blob } = await audioSource(item);
+  if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
+  if (blob) blobUrl = src;
+  const a = new Audio(src);
   a.preload = 'metadata';
   a.addEventListener('loadedmetadata', () => { if (start) a.currentTime = start; }, { once: true });
   a.onplay = () => setPlaying(true); a.onpause = () => setPlaying(false); a.onended = () => { setPlaying(false); ended(); };
-  $('#media').innerHTML = `<div class="cover">${SUN}</div>`;
+  a.onerror = () => toast('Audio indisponible. Télécharge-le quand tu as du réseau.');
+  const bg = item.yt && online() ? ` style="background-image:url('https://i.ytimg.com/vi/${item.yt}/hqdefault.jpg')"` : '';
+  $('#media').innerHTML = `<div class="cover ${bg ? 'img' : ''}"${bg}>${SUN}<span>${isDl(item.id) ? 'Écoute hors ligne' : 'Écoute audio'}</span></div>`;
   if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({ title: item.title, artist: PASTOR, album: 'Soleil Couchant' });
+    navigator.mediaSession.metadata = new MediaMetadata({ title: item.title, artist: PASTOR, album: 'Soleil Couchant', artwork: [{ src: abs('icons/icon-512.png'), sizes: '512x512', type: 'image/png' }] });
     navigator.mediaSession.setActionHandler('play', () => a.play());
     navigator.mediaSession.setActionHandler('pause', () => a.pause());
     navigator.mediaSession.setActionHandler('seekbackward', () => a.currentTime -= 15);
@@ -378,13 +557,12 @@ function makeAudio(item, start) {
     navigator.mediaSession.setActionHandler('nexttrack', () => step(1));
     navigator.mediaSession.setActionHandler('previoustrack', () => step(-1));
   }
-  return Promise.resolve({
+  return {
     play: () => a.play(), pause: () => a.pause(), seek: t => a.currentTime = t,
     time: () => a.currentTime, dur: () => a.duration || 0, rate: r => a.playbackRate = r,
     destroy: () => { a.pause(); a.removeAttribute('src'); a.load(); }
-  });
+  };
 }
-
 function persist() {
   if (!engine || !current) return;
   const t = engine.time(), d = engine.dur();
@@ -394,7 +572,7 @@ function persist() {
 function stopAll() {
   persist();
   if (engine) engine.destroy();
-  engine = null; current = null; setPlaying(false);
+  engine = null; current = null; mode = null; setPlaying(false);
   $('#mini').style.display = 'none'; $('#full').classList.remove('open'); $('#media').innerHTML = '';
 }
 function ended() {
@@ -405,34 +583,73 @@ function ended() {
 function step(dir) {
   if (!current) return;
   const i = sermons.findIndex(s => s.id === current.id);
-  // la liste est de la plus récente à la plus ancienne : « suivante » = la suivante dans la liste
   const n = sermons[i + dir];
-  if (n) openSermon(n.id, true);
+  if (n) openSermon(n.id);
 }
 
-async function openSermon(id, keepOpen) {
+/* modes : audio | video | text */
+const canAudio = s => s.audio && (isDl(s.id) || online());
+const canVideo = s => s.yt && online();
+const canText = s => s.transcript && (txtOk[s.id] || online());
+function updateSeg() {
+  const seg = $('#seg');
+  if (!current) { seg.hidden = true; return; }
+  const opts = [['segAudio', 'audio', canAudio(current)], ['segVideo', 'video', canVideo(current)], ['segText', 'text', canText(current)]];
+  const has = { audio: !!current.audio, video: !!current.yt, text: !!current.transcript };
+  const shown = opts.filter(o => has[o[1]]);
+  seg.hidden = shown.length < 2;
+  opts.forEach(([id, m, ok]) => { const b = $('#' + id); b.hidden = !has[m]; b.disabled = !ok; b.classList.toggle('on', mode === m); });
+}
+async function startMode(m, start) {
+  const item = current;
+  if (engine) { persist(); engine.destroy(); engine = null; }
+  setPlaying(false);
+  mode = m; updateSeg();
+  if (m === 'text') {
+    const bg = item.yt && online() ? ` style="background-image:url('https://i.ytimg.com/vi/${item.yt}/hqdefault.jpg')"` : '';
+    $('#media').innerHTML = `<div class="cover ${bg ? 'img' : ''}"${bg}>${SUN}<span>Lecture du texte</span></div>`;
+    $('#txBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  const e = await (m === 'audio' ? makeAudio : makeYT)(item, start);
+  if (current !== item || mode !== m) { e.destroy(); return; }
+  engine = e; engine.rate(settings.rate);
+  if (m === 'audio') engine.play().catch(() => {});
+}
+async function switchMode(m) {
+  if (!current || m === mode) return;
+  if (m === 'audio' && !canAudio(current)) { toast('Audio indisponible hors ligne'); return; }
+  if (m === 'video' && !canVideo(current)) { toast('La vidéo demande une connexion'); return; }
+  if (m === 'text' && !canText(current)) { toast('Texte indisponible hors ligne'); return; }
+  const t = engine ? engine.time() : pos(current.id);
+  await startMode(m, t);
+}
+$('#segAudio').onclick = () => switchMode('audio');
+$('#segVideo').onclick = () => switchMode('video');
+$('#segText').onclick = () => switchMode('text');
+
+async function openSermon(id) {
   const item = byId(id); if (!item) return;
-  if (current && current.id === item.id && engine) { $('#full').classList.add('open'); return; }
+  if (current && current.id === item.id) { $('#full').classList.add('open'); return; }
+  let m = canAudio(item) ? 'audio' : canVideo(item) ? 'video' : canText(item) ? 'text' : null;
+  if (!m) { toast(online() ? 'Rien à lire pour cette prédication' : 'Indisponible hors ligne : télécharge-la quand tu as du réseau'); return; }
   persist();
   if (engine) { engine.destroy(); engine = null; }
   current = item; playing = false;
   history = [item.id, ...history.filter(x => x !== item.id)].slice(0, 50); saveAll();
   $('#ftitle').textContent = item.title; $('#miniT').textContent = item.title;
   $('#miniTh').style.backgroundImage = item.yt ? `url('https://i.ytimg.com/vi/${item.yt}/mqdefault.jpg')` : '';
-  $('#note').textContent = item.audio ? 'La lecture continue écran éteint.' : 'Garde l\'application ouverte pour continuer l\'écoute. L\'écoute écran éteint viendra avec les fichiers audio.';
+  $('#note').textContent = item.audio ? 'En mode audio, la lecture continue écran éteint.' : 'Garde l\'application ouverte pour continuer l\'écoute. L\'écoute écran éteint demande une version audio.';
   $('#mini').style.display = 'flex'; $('#full').classList.add('open');
-  renderQueue(); updateFavBtn(); setPlaying(false);
-  const e = await (item.audio ? makeAudio : makeYT)(item, pos(item.id));
-  if (current !== item) { e.destroy(); return; }
-  engine = e; engine.rate(settings.rate); updateRate();
-  if (item.audio) engine.play();
+  renderQueue(); updateFavBtn(); refreshDl(); setPlaying(false);
+  loadTranscript(item);
+  await startMode(m, pos(item.id));
   render();
 }
 function renderQueue() {
   if (!current) return;
   const i = sermons.findIndex(s => s.id === current.id);
-  const next = sermons.slice(i + 1, i + 9);
-  $('#queue').innerHTML = (current ? row(current, 'En cours de lecture') : '') + next.map(s => row(s)).join('');
+  $('#queue').innerHTML = row(current, 'En cours de lecture') + sermons.slice(i + 1, i + 9).map(s => row(s)).join('');
 }
 function updateFavBtn() {
   if (!current) return;
@@ -441,11 +658,71 @@ function updateFavBtn() {
 }
 function updateRate() { $('#rate').textContent = 'Vitesse ' + settings.rate + 'x'; }
 
+/* ---------- TRANSCRIPTION ---------- */
+let cues = [], cueEls = [], activeCue = -1;
+function parseTime(s) {
+  const p = s.replace(',', '.').split(':').map(Number);
+  return p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p[0] * 60 + p[1];
+}
+function parseTranscript(txt) {
+  txt = txt.replace(/\r/g, '');
+  if (/-->/.test(txt)) {
+    const out = [];
+    txt.split(/\n\s*\n/).forEach(block => {
+      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+      const i = lines.findIndex(l => l.includes('-->'));
+      if (i < 0) return;
+      const m = lines[i].match(/((?:\d+:)?\d+:\d+[.,]\d+)\s*-->\s*((?:\d+:)?\d+:\d+[.,]\d+)/);
+      if (!m) return;
+      const text = lines.slice(i + 1).join(' ').replace(/<[^>]+>/g, '').trim();
+      if (text) out.push({ t: parseTime(m[1]), text });
+    });
+    return out;
+  }
+  return txt.split(/\n\s*\n/).map(p => p.replace(/\n/g, ' ').trim()).filter(Boolean).map(text => ({ t: null, text }));
+}
+async function loadTranscript(item) {
+  const box = $('#txBox'), body = $('#txBody');
+  cues = []; cueEls = []; activeCue = -1; body.innerHTML = '';
+  box.hidden = !item.transcript;
+  if (!item.transcript) return;
+  body.innerHTML = '<p>Chargement du texte…</p>';
+  const txt = await getText(item);
+  if (current !== item) return;
+  if (!txt) { body.innerHTML = '<p>Texte indisponible pour le moment.</p>'; return; }
+  cues = parseTranscript(txt);
+  body.innerHTML = cues.map((c, i) => `<p class="${c.t != null ? 'cue' : ''}" data-i="${i}">${esc(c.text)}</p>`).join('');
+  cueEls = [...body.children];
+  updateSeg();
+}
+$('#txBody').addEventListener('click', e => {
+  const p = e.target.closest('p.cue'); if (!p) return;
+  const c = cues[+p.dataset.i];
+  if (engine && c) { engine.seek(c.t); if (!playing) engine.play(); }
+});
+function syncCue(t) {
+  if (!cues.length || cues[0].t == null) return;
+  let lo = 0, hi = cues.length - 1, idx = -1;
+  while (lo <= hi) { const mid = (lo + hi) >> 1; if (cues[mid].t <= t) { idx = mid; lo = mid + 1; } else hi = mid - 1; }
+  if (idx === activeCue) return;
+  if (cueEls[activeCue]) cueEls[activeCue].classList.remove('on');
+  activeCue = idx;
+  const el = cueEls[idx]; if (!el) return;
+  el.classList.add('on');
+  const body = $('#txBody');
+  body.scrollTo({ top: el.offsetTop - body.clientHeight / 2 + el.clientHeight / 2, behavior: 'smooth' });
+}
+function applyTxSize() { $('#txBody').style.setProperty('--txs', settings.txs + 'px'); document.documentElement.style.setProperty('--txs', settings.txs + 'px'); }
+$('#txPlus').onclick = () => { settings.txs = Math.min(28, settings.txs + 2); saveAll(); applyTxSize(); };
+$('#txMinus').onclick = () => { settings.txs = Math.max(12, settings.txs - 2); saveAll(); applyTxSize(); };
+applyTxSize();
+
+/* ---------- COMMANDES ---------- */
 function setPlaying(p) {
   playing = p;
   $('#play').innerHTML = p ? I.pause : I.play;
   $('#miniPlay').innerHTML = p ? I.pause : I.play;
-  document.querySelectorAll('.row.cur .th').forEach(th => { th.innerHTML = p ? '<div class="eq"><i></i><i></i><i></i></div>' : ''; });
+  document.querySelectorAll('.row.cur .th').forEach(th => { const e = th.querySelector('.eq'); if (p && !e) th.insertAdjacentHTML('beforeend', '<div class="eq"><i></i><i></i><i></i></div>'); if (!p && e) e.remove(); });
   if (!p) persist();
 }
 setPlaying(false); updateRate();
@@ -479,12 +756,13 @@ setInterval(() => {
   const t = engine.time(), d = engine.dur();
   if (!dragging && d) { $('#seek').value = t / d * 1000; $('#tcur').textContent = fmt(t); }
   $('#tdur').textContent = fmt(d); $('#miniBar').style.width = d ? (t / d * 100) + '%' : '0';
+  syncCue(t);
   if (playing && Date.now() - lastSave > 5000) { persist(); lastSave = Date.now(); }
   if (sleepAt && Date.now() > sleepAt) { engine.pause(); sleepAt = 0; sleepI = 0; $('#sleep').textContent = 'Minuteur'; $('#sleep').classList.remove('on'); }
 }, 500);
 addEventListener('pagehide', persist);
 
-/* ---------- AJOUT ---------- */
+/* ---------- AJOUT D'UN LIEN YOUTUBE ---------- */
 const dlg = $('#dlg');
 function openDialog() { $('#urls').value = ''; dlg.showModal(); }
 $('#cancel').onclick = () => dlg.close();
@@ -504,12 +782,16 @@ $('#save').onclick = async () => {
     }
     return { id, yt: id, title: title || 'Prédication' };
   }));
-  sermons = [...added, ...sermons]; saveAll();
+  local = [...added, ...local]; saveAll(); rebuild();
   $('#save').disabled = false; $('#save').textContent = 'Ajouter';
   dlg.close(); render(); toast(added.length + ' prédication' + (added.length > 1 ? 's ajoutées' : ' ajoutée'));
 };
 
+/* ---------- DÉMARRAGE ---------- */
+syncOnline();
 render();
+loadCatalog();
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
 </body>
 </html>
