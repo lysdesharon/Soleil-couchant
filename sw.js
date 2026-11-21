@@ -2,7 +2,7 @@
    - L'appli (index, icônes, manifest) est gardée en cache : elle s'ouvre sans réseau.
    - sermons.json : réseau d'abord, sinon la dernière copie.
    - Audio et transcriptions : gérés par l'appli elle-même (téléchargement volontaire). */
-const V = 'sc-shell-v3';
+const V = 'sc-shell-v4';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'sermons.json'];
 
 self.addEventListener('install', e => {

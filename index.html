@@ -111,6 +111,7 @@ nav.tabs button.on{color:var(--gold)}
 .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px;margin:14px 0 0}
 .seg button{flex:1;padding:8px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
 .seg button.on{background:var(--gold);color:var(--ink)}
+.seg button.na{opacity:.4}
 #media{margin:14px 0 16px;border-radius:20px;overflow:hidden;background:#000;aspect-ratio:16/9;width:100%;box-shadow:0 16px 40px #0008}
 #media iframe{width:100%;height:100%;border:0}
 .cover{height:100%;display:grid;place-items:center;background:radial-gradient(circle at 50% 75%,#e9b24c,#7a4a12 50%,#0f1830);background-size:cover;background-position:center;position:relative}
@@ -238,11 +239,11 @@ const ytId = u => { const m = String(u || '').match(/(?:v=|youtu\.be\/|embed\/|s
 function normalize(s) {
   const yt = ytId(s.yt);
   const id = String(s.id || yt || s.audio || s.title);
-  return { id, title: s.title || 'Prédication', date: s.date || '', yt, audio: s.audio || '', transcript: s.transcript || '', local: !!s.local };
+  return { id, title: s.title || 'Prédication', date: s.date || '', yt, audio: s.audio || '', transcript: s.transcript || '', local: !!s.local, demo: !!s.demo };
 }
 function rebuild() {
   const seen = new Set();
-  const sorted = catalog.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));   // les plus récentes d'abord, sans date à la fin
+  const sorted = catalog.filter(s => !s.demo || settings.demo).sort((a, b) => (b.date || '').localeCompare(a.date || ''));   // les plus récentes d'abord, sans date à la fin
   sermons = [...local.map(s => ({ ...s, local: true })), ...sorted].map(normalize).filter(s => !seen.has(s.id) && seen.add(s.id));
 }
 async function loadCatalog() {
@@ -383,14 +384,16 @@ function viewSet() {
   return `<header class="top">${LOGO}<div><h1>Réglages</h1><small>Soleil Couchant</small></div></header>
     <div class="set" style="margin-top:14px">
       ${standalone() ? '<div class="it"><span>Application installée</span><span class="v">✓</span></div>' : `<button data-act="install"><span>Installer l'application</span><span class="v">Installer</span></button>`}
+      <button data-act="demo"><span>Exemple pour tester l'audio, le texte et le hors ligne</span><span class="v">${settings.demo ? 'Activé' : 'Désactivé'}</span></button>
       <button data-act="rate"><span>Vitesse de lecture par défaut</span><span class="v">${settings.rate}x</span></button>
       <button data-act="add"><span>Ajouter un lien YouTube</span><span class="v">+</span></button>
       <button data-act="channel"><span>Chaîne YouTube du pasteur</span><span class="v">Ouvrir ↗</span></button>
       <div class="it"><span>Téléchargements</span><span class="v">${Object.keys(dl).length} · ${mb(total)}</span></div>
+      <button data-act="refresh"><span>Mettre l'application à jour</span><span class="v">Version 4</span></button>
       <button data-act="cleardl"><span style="color:#ff8f8f">Supprimer les téléchargements</span></button>
       <button data-act="clear"><span style="color:#ff8f8f">Retirer mes liens ajoutés</span></button>
     </div>
-    <p class="about"><span class="serif" style="font-size:20px">Soleil Couchant Tabernacle</span><br>Les prédications du ${PASTOR}, en vidéo, en audio et en texte, même sans réseau.<br>Version 3 · Français</p>`;
+    <p class="about"><span class="serif" style="font-size:20px">Soleil Couchant Tabernacle</span><br>Les prédications du ${PASTOR}, en vidéo, en audio et en texte, même sans réseau.<br>Version 4 · Français</p>`;
 }
 function render() {
   const keepQ = document.activeElement && document.activeElement.id === 'q';
@@ -417,6 +420,8 @@ document.addEventListener('click', e => {
     else if (k === 'noinstall') { LS.set('sc_noinstall', true); render(); }
     else if (k === 'libback') { libView = null; render(); }
     else if (k === 'soon') toast('Bientôt disponible');
+    else if (k === 'demo') { settings.demo = !settings.demo; saveAll(); rebuild(); render(); toast(settings.demo ? 'Va dans Recherche : « Exemple pour tester »' : 'Exemple masqué'); }
+    else if (k === 'refresh') refreshApp();
     else if (k === 'rate') { settings.rate = RATES[(RATES.indexOf(settings.rate) + 1) % RATES.length]; saveAll(); render(); }
     else if (k === 'channel') window.open(CHANNEL, '_blank', 'noopener');
     else if (k === 'cleardl') { if (confirm('Supprimer tous les téléchargements ?')) clearDownloads(); }
@@ -429,6 +434,15 @@ document.addEventListener('input', e => {
 function toggleFav(id) {
   favs = favs.includes(id) ? favs.filter(x => x !== id) : [id, ...favs];
   saveAll(); render(); renderQueue(); updateFavBtn();
+}
+async function refreshApp() {
+  toast('Mise à jour…');
+  try {
+    (await caches.keys()).filter(k => k.startsWith('sc-shell-')).forEach(k => caches.delete(k));
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map(r => r.unregister()));
+  } catch {}
+  setTimeout(() => location.reload(), 600);
 }
 function syncOnline() { document.body.classList.toggle('off', !online()); updateSeg(); }
 addEventListener('online', () => { syncOnline(); loadCatalog(); });
@@ -489,14 +503,15 @@ async function clearDownloads() {
 }
 function refreshDl() {
   const b = $('#dlBtn');
-  if (!current || !current.audio) { b.hidden = true; return; }
+  if (!current) { b.hidden = true; return; }
   b.hidden = false;
+  if (!current.audio) { b.textContent = '⤓ Télécharger'; b.classList.remove('ok'); b.disabled = false; return; }
   const p = dlProg[current.id];
   b.classList.toggle('ok', isDl(current.id));
   b.textContent = p != null ? `⤓ ${Math.round(p * 100)} %` : isDl(current.id) ? '✓ Hors ligne · Retirer' : '⤓ Télécharger';
   b.disabled = p != null;
 }
-$('#dlBtn').onclick = () => { if (!current) return; isDl(current.id) ? removeDl(current) : download(current); };
+$('#dlBtn').onclick = () => { if (!current) return; if (!current.audio) { toast('Le téléchargement sera possible quand l\'audio de cette prédication sera ajouté'); return; } isDl(current.id) ? removeDl(current) : download(current); };
 
 /* ---------- MOTEURS DE LECTURE ---------- */
 let ytReady = false, ytQueue = [];
@@ -601,9 +616,8 @@ function updateSeg() {
   if (!current) { seg.hidden = true; return; }
   const opts = [['segAudio', 'audio', canAudio(current)], ['segVideo', 'video', canVideo(current)], ['segText', 'text', canText(current)]];
   const has = { audio: !!current.audio, video: !!current.yt, text: !!current.transcript };
-  const shown = opts.filter(o => has[o[1]]);
-  seg.hidden = shown.length < 2;
-  opts.forEach(([id, m, ok]) => { const b = $('#' + id); b.hidden = !has[m]; b.disabled = !ok; b.classList.toggle('on', mode === m); });
+  seg.hidden = false;   // les trois onglets sont toujours visibles ; ceux qui manquent sont grisés et expliqués au toucher
+  opts.forEach(([id, m, ok]) => { const b = $('#' + id); b.hidden = false; b.disabled = false; b.classList.toggle('na', !has[m] || !ok); b.classList.toggle('on', mode === m); });
 }
 async function startMode(m, start) {
   const item = current;
@@ -623,9 +637,13 @@ async function startMode(m, start) {
 }
 async function switchMode(m) {
   if (!current || m === mode) return;
-  if (m === 'audio' && !canAudio(current)) { toast('Audio indisponible hors ligne'); return; }
-  if (m === 'video' && !canVideo(current)) { toast('La vidéo demande une connexion'); return; }
-  if (m === 'text' && !canText(current)) { toast('Texte indisponible hors ligne'); return; }
+  const msg = {
+    audio: !current.audio ? 'Pas encore de version audio pour cette prédication' : 'Audio indisponible sans réseau : télécharge-le d\'abord',
+    video: !current.yt ? 'Pas de vidéo pour cette prédication' : 'La vidéo demande une connexion',
+    text: !current.transcript ? 'Pas encore de texte pour cette prédication' : 'Texte indisponible sans réseau'
+  };
+  const ok = { audio: canAudio, video: canVideo, text: canText }[m](current);
+  if (!ok) { toast(msg[m]); return; }
   const t = engine ? engine.time() : pos(current.id);
   await startMode(m, t);
 }

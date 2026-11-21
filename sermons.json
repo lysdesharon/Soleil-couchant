@@ -1,14 +1,68 @@
 {
   "sermons": [
-    { "id": "qu-attend-dieu-de-moi-1", "title": "Qu'attend Dieu de moi (1ère partie)", "date": "2024-02-03", "yt": "7GZSzkDyCC0" },
-    { "id": "maison-de-priere-du-tout-puissant-1", "title": "La maison de prière du Tout-Puissant (vol. 1)", "date": "2024-02-28", "yt": "TSjpf0LsOXQ" },
-    { "id": "l-adoption-la-predestination", "title": "L'adoption : la prédestination", "date": "2023-12-03", "yt": "QClTq6HXjXc" },
-    { "id": "le-dernier-miracle-de-jesus", "title": "Le dernier miracle de Jésus", "date": "2022-07-10", "yt": "LMIxafrRw-A" },
-    { "id": "le-jugement-divin", "title": "Le jugement divin : le 3ème pull", "date": "2022-01-23", "yt": "2QEusJ41aEE" },
-    { "id": "recois-ta-benediction", "title": "Reçois ta bénédiction", "yt": "-yazhEHK4gg" },
-    { "id": "le-festin-de-belschatsar", "title": "Le festin de Belschatsar", "yt": "3SWUNiesvjA" },
-    { "id": "la-verite-sur-satan-1-2", "title": "La vérité sur Satan (partie 1.2)", "date": "2012-04-15", "yt": "iRwi9xYmT6s" },
-    { "id": "la-verite-sur-satan-1", "title": "La vérité sur Satan (partie 1)", "yt": "azZ4MPCydmA" },
-    { "id": "reve-de-neboukadnetsar-2", "title": "Le rêve de Neboukadnetsar et la vision des 4 bêtes (2)", "date": "2012-07-15", "yt": "ojy72tJ5Shg" }
+    {
+      "id": "qu-attend-dieu-de-moi-1",
+      "title": "Qu'attend Dieu de moi (1ère partie)",
+      "date": "2024-02-03",
+      "yt": "7GZSzkDyCC0"
+    },
+    {
+      "id": "maison-de-priere-du-tout-puissant-1",
+      "title": "La maison de prière du Tout-Puissant (vol. 1)",
+      "date": "2024-02-28",
+      "yt": "TSjpf0LsOXQ"
+    },
+    {
+      "id": "l-adoption-la-predestination",
+      "title": "L'adoption : la prédestination",
+      "date": "2023-12-03",
+      "yt": "QClTq6HXjXc"
+    },
+    {
+      "id": "le-dernier-miracle-de-jesus",
+      "title": "Le dernier miracle de Jésus",
+      "date": "2022-07-10",
+      "yt": "LMIxafrRw-A"
+    },
+    {
+      "id": "le-jugement-divin",
+      "title": "Le jugement divin : le 3ème pull",
+      "date": "2022-01-23",
+      "yt": "2QEusJ41aEE"
+    },
+    {
+      "id": "recois-ta-benediction",
+      "title": "Reçois ta bénédiction",
+      "yt": "-yazhEHK4gg"
+    },
+    {
+      "id": "le-festin-de-belschatsar",
+      "title": "Le festin de Belschatsar",
+      "yt": "3SWUNiesvjA"
+    },
+    {
+      "id": "la-verite-sur-satan-1-2",
+      "title": "La vérité sur Satan (partie 1.2)",
+      "date": "2012-04-15",
+      "yt": "iRwi9xYmT6s"
+    },
+    {
+      "id": "la-verite-sur-satan-1",
+      "title": "La vérité sur Satan (partie 1)",
+      "yt": "azZ4MPCydmA"
+    },
+    {
+      "id": "reve-de-neboukadnetsar-2",
+      "title": "Le rêve de Neboukadnetsar et la vision des 4 bêtes (2)",
+      "date": "2012-07-15",
+      "yt": "ojy72tJ5Shg"
+    },
+    {
+      "id": "exemple",
+      "title": "Exemple pour tester (son d'essai, pas une prédication)",
+      "demo": true,
+      "audio": "audio/exemple.mp3",
+      "transcript": "transcripts/exemple.vtt"
+    }
   ]
 }
