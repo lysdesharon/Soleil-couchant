@@ -25,7 +25,7 @@ button:disabled{opacity:.45;cursor:default}
 .serif{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:600;color:var(--gold)}
 #app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:calc(150px + env(safe-area-inset-bottom));background:radial-gradient(120% 40% at 50% 0%,#18274a 0%,var(--bg) 70%)}
 header.top{padding:calc(18px + env(safe-area-inset-top)) 18px 6px;display:flex;align-items:center;gap:12px}
-.logo{width:38px;height:38px;flex:none}
+.logo{height:46px;width:auto;flex:none}
 header.top h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px}
 header.top small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
 h2.sec{font-size:17px;margin:26px 18px 12px;display:flex;justify-content:space-between;align-items:baseline;font-weight:700}
@@ -37,6 +37,13 @@ body.off #offline{display:block}
 .install{margin:14px 18px 0;background:linear-gradient(120deg,#2a1d08,#14203a);border:1px solid #e9b24c55;border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:center}
 .install p{margin:0;font-size:13px;line-height:1.45;flex:1;color:#e9dcc0}
 .install .x{color:var(--muted);padding:6px;font-size:16px}
+.tg.new{background:#e9b24c26;color:var(--gold2)}
+.anns{padding:0 18px;display:flex;flex-direction:column;gap:10px}
+.ann{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.ann .ad{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold2);font-weight:700}
+.ann b{display:block;margin:4px 0 6px;font-size:15px}
+.ann p{margin:0;font-size:13.5px;line-height:1.55;color:#cfd7ec;white-space:pre-line}
+.ann a{display:inline-block;margin-top:8px;color:var(--gold);font-size:13px;font-weight:600;text-decoration:none}
 .hero{margin:14px 18px 0;border-radius:22px;overflow:hidden;position:relative;background:var(--card);border:1px solid var(--line);cursor:pointer}
 .hero .img{aspect-ratio:16/9;background-size:cover;background-position:center;background-color:#1b2a4d}
 .hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,#0a102000 30%,#0a1020ee 100%)}
@@ -58,7 +65,7 @@ body.off #offline{display:block}
 .row:active{background:var(--card)}
 .row.cur{background:var(--card2);box-shadow:inset 0 0 0 1px #e9b24c55}
 .row .th{width:84px;height:48px;border-radius:9px;flex:none;background-size:cover;background-position:center;background-color:#1b2a4d;position:relative;display:grid;place-items:center}
-.row .th .sunmini{width:26px;opacity:.55}
+.row .th .sunmini img{height:32px;width:auto;opacity:.6;display:block}
 .row .rm{flex:1;min-width:0}
 .row .rt{font-size:14px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .row .rs{font-size:12px;color:var(--muted);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -116,8 +123,8 @@ nav.tabs button.on{color:var(--gold)}
 #media iframe{width:100%;height:100%;border:0}
 .cover{height:100%;display:grid;place-items:center;background:radial-gradient(circle at 50% 75%,#e9b24c,#7a4a12 50%,#0f1830);background-size:cover;background-position:center;position:relative}
 .cover.img::after{content:"";position:absolute;inset:0;background:#0a1020b8}
-.cover svg,.cover span{position:relative;z-index:1}
-.cover svg{width:84px;height:84px}
+.cover img,.cover span{position:relative;z-index:1}
+.cover img{height:104px;width:auto}
 .cover span{position:absolute;bottom:12px;font-size:12px;color:#fff;font-weight:600;letter-spacing:.5px}
 #ftitle{font-size:20px;line-height:1.3;margin:0 0 4px;font-weight:700}
 #fsub{color:var(--muted);font-size:13px;margin-bottom:16px}
@@ -233,17 +240,22 @@ let settings = LS.get('sc_set', { rate: 1, txs: 16 });
 let dl = LS.get('sc_dl', {});          // id -> octets téléchargés (audio)
 let txtOk = LS.get('sc_txt', {});      // id -> transcription gardée hors ligne
 let dlProg = {};                        // id -> 0..1 pendant un téléchargement
+let auto = LS.get('sc_auto', []);      // dernières vidéos lues sur la chaîne YouTube
+let anns = LS.get('sc_anns', []);      // annonces de l'église
+let pushOn = false, showAllAnn = false;
 const saveAll = () => { LS.set('sc_local', local); LS.set('sc_favs', favs); LS.set('sc_hist', history); LS.set('sc_set', settings); LS.set('sc_dl', dl); LS.set('sc_txt', txtOk); };
 
 const ytId = u => { const m = String(u || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(String(u || '')) ? u : null); };
 function normalize(s) {
   const yt = ytId(s.yt);
   const id = String(s.id || yt || s.audio || s.title);
-  return { id, title: s.title || 'Prédication', date: s.date || '', yt, audio: s.audio || '', transcript: s.transcript || '', local: !!s.local, demo: !!s.demo };
+  return { id, title: s.title || 'Prédication', date: s.date || '', yt, audio: s.audio || '', transcript: s.transcript || '', local: !!s.local, demo: !!s.demo, auto: !!s.auto };
 }
 function rebuild() {
   const seen = new Set();
-  const sorted = catalog.filter(s => !s.demo || settings.demo).sort((a, b) => (b.date || '').localeCompare(a.date || ''));   // les plus récentes d'abord, sans date à la fin
+  const have = new Set(catalog.map(s => ytId(s.yt)).filter(Boolean));
+  const merged = [...catalog, ...auto.filter(a => !have.has(ytId(a.yt))).map(a => ({ ...a, auto: true }))];
+  const sorted = merged.filter(s => !s.demo || settings.demo).sort((a, b) => (b.date || '').localeCompare(a.date || ''));   // les plus récentes d'abord, sans date à la fin
   sermons = [...local.map(s => ({ ...s, local: true })), ...sorted].map(normalize).filter(s => !seen.has(s.id) && seen.add(s.id));
 }
 async function loadCatalog() {
@@ -270,14 +282,16 @@ const I = {
   dl: '<svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>',
   list: '<svg viewBox="0 0 24 24"><path d="M4 6h12M4 12h12M4 18h8M19 15v6m-3-3h6"/></svg>'
 };
-const SUN = '<svg viewBox="0 0 64 64"><path d="M10 40a22 22 0 0 1 44 0z" fill="#f6cf7d"/><path d="M8 46h48M16 52h32M24 58h16" stroke="#f6cf7d" stroke-width="3" stroke-linecap="round"/></svg>';
-const LOGO = '<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6cf7d"/><stop offset="1" stop-color="#e08a2c"/></linearGradient></defs><circle cx="32" cy="36" r="20" fill="url(#lg)"/><rect y="38" width="64" height="26" fill="#0a1020"/><path d="M8 43h48M15 50h34M23 57h18" stroke="#e9b24c" stroke-width="3" stroke-linecap="round"/></svg>';
+const SUN = '<img src="icons/logo-mark.png" alt="">';
+const LOGO = '<img class="logo" src="icons/logo-mark.png" alt="Soleil Couchant">';
 
 const fmt = s => {
   s = Math.max(0, Math.floor(s || 0));
   const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60;
   return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(r).padStart(2, '0');
 };
+const isNew = s => s.date && (Date.now() - Date.parse(s.date)) < 14 * 864e5;
+const fmtDate = iso => { try { return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }); } catch { return ''; } };
 const mb = b => b >= 1e9 ? (b / 1e9).toFixed(1) + ' Go' : Math.max(1, Math.round(b / 1e6)) + ' Mo';
 const thumbStyle = s => s.yt ? `style="background-image:url('https://i.ytimg.com/vi/${s.yt}/mqdefault.jpg')"` : '';
 const pos = id => LS.get('sc_pos_' + id, 0);
@@ -318,6 +332,7 @@ function tags(s) {
   let t = '';
   if (isDl(s.id)) t += '<span class="tg ok">Hors ligne</span>';
   else if (dlProg[s.id] != null) t += `<span class="tg">${Math.round(dlProg[s.id] * 100)}%</span>`;
+  if (isNew(s)) t += '<span class="tg new">Nouveau</span>';
   if (s.audio) t += '<span class="tg">Audio</span>';
   if (s.yt) t += '<span class="tg">Vidéo</span>';
   if (s.transcript) t += '<span class="tg">Texte</span>';
@@ -336,7 +351,7 @@ function row(s, extra = '') {
 const emptyBlock = `<div class="empty"><span class="big serif">Aucune prédication</span>Les prédications du pasteur apparaîtront ici dès qu'elles seront ajoutées au catalogue. Tu peux déjà ajouter un lien YouTube sur ton téléphone.<br><button class="btn" data-act="add">+ Ajouter un lien YouTube</button></div>`;
 
 function viewHome() {
-  let h = `<header class="top">${LOGO}<div><h1>Soleil Couchant</h1><small>${PASTOR}</small></div></header>` + installBanner();
+  let h = `<header class="top">${LOGO}<div><h1>Soleil Couchant</h1><small>${PASTOR}</small></div></header>` + installBanner() + pushBanner() + annBlock();
   if (!sermons.length) return h + emptyBlock;
   const latest = sermons[0];
   h += `<div class="hero" data-play="${esc(latest.id)}"><div class="img" ${thumbStyle(latest)}></div><div class="shade"></div>
@@ -384,16 +399,17 @@ function viewSet() {
   return `<header class="top">${LOGO}<div><h1>Réglages</h1><small>Soleil Couchant</small></div></header>
     <div class="set" style="margin-top:14px">
       ${standalone() ? '<div class="it"><span>Application installée</span><span class="v">✓</span></div>' : `<button data-act="install"><span>Installer l'application</span><span class="v">Installer</span></button>`}
+      ${notifRow()}
       <button data-act="demo"><span>Exemple pour tester l'audio, le texte et le hors ligne</span><span class="v">${settings.demo ? 'Activé' : 'Désactivé'}</span></button>
       <button data-act="rate"><span>Vitesse de lecture par défaut</span><span class="v">${settings.rate}x</span></button>
       <button data-act="add"><span>Ajouter un lien YouTube</span><span class="v">+</span></button>
       <button data-act="channel"><span>Chaîne YouTube du pasteur</span><span class="v">Ouvrir ↗</span></button>
       <div class="it"><span>Téléchargements</span><span class="v">${Object.keys(dl).length} · ${mb(total)}</span></div>
-      <button data-act="refresh"><span>Mettre l'application à jour</span><span class="v">Version 4</span></button>
+      <button data-act="refresh"><span>Mettre l'application à jour</span><span class="v">Version 5</span></button>
       <button data-act="cleardl"><span style="color:#ff8f8f">Supprimer les téléchargements</span></button>
       <button data-act="clear"><span style="color:#ff8f8f">Retirer mes liens ajoutés</span></button>
     </div>
-    <p class="about"><span class="serif" style="font-size:20px">Soleil Couchant Tabernacle</span><br>Les prédications du ${PASTOR}, en vidéo, en audio et en texte, même sans réseau.<br>Version 4 · Français</p>`;
+    <p class="about"><span class="serif" style="font-size:20px">Soleil Couchant Tabernacle</span><br>Les prédications du ${PASTOR}, en vidéo, en audio et en texte, même sans réseau.<br>Version 5 · Français</p>`;
 }
 function render() {
   const keepQ = document.activeElement && document.activeElement.id === 'q';
@@ -422,6 +438,13 @@ document.addEventListener('click', e => {
     else if (k === 'soon') toast('Bientôt disponible');
     else if (k === 'demo') { settings.demo = !settings.demo; saveAll(); rebuild(); render(); toast(settings.demo ? 'Va dans Recherche : « Exemple pour tester »' : 'Exemple masqué'); }
     else if (k === 'refresh') refreshApp();
+    else if (k === 'pushon') enablePush();
+    else if (k === 'pushtoggle') {
+      if (Notification.permission === 'denied') toast('Notifications bloquées : autorise-les dans les réglages du navigateur pour ce site');
+      else pushOn ? disablePush() : enablePush();
+    }
+    else if (k === 'nopush') { LS.set('sc_nopush', true); render(); }
+    else if (k === 'annmore') { showAllAnn = !showAllAnn; render(); }
     else if (k === 'rate') { settings.rate = RATES[(RATES.indexOf(settings.rate) + 1) % RATES.length]; saveAll(); render(); }
     else if (k === 'channel') window.open(CHANNEL, '_blank', 'noopener');
     else if (k === 'cleardl') { if (confirm('Supprimer tous les téléchargements ?')) clearDownloads(); }
@@ -435,6 +458,90 @@ function toggleFav(id) {
   favs = favs.includes(id) ? favs.filter(x => x !== id) : [id, ...favs];
   saveAll(); render(); renderQueue(); updateFavBtn();
 }
+/* ---------- MISES À JOUR EN LIGNE : nouvelles vidéos de la chaîne + annonces ---------- */
+const FN = p => '/.netlify/functions/' + p;
+let lastSync = 0;
+async function syncRemote(force) {
+  if (!online() || (!force && Date.now() - lastSync < 5 * 60 * 1000)) return;
+  lastSync = Date.now();
+  const get = async p => {
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 8000);
+    try { const r = await fetch(FN(p), { signal: ctl.signal }); if (!r.ok) throw 0; return await r.json(); } finally { clearTimeout(t); }
+  };
+  try {
+    const j = await get('youtube');
+    if (Array.isArray(j.videos) && j.videos.length) { auto = j.videos.slice(0, 30); LS.set('sc_auto', auto); rebuild(); render(); }
+  } catch {}
+  try {
+    const j = await get('announcements');
+    if (Array.isArray(j.announcements)) { anns = j.announcements; LS.set('sc_anns', anns); render(); }
+  } catch {}
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncRemote(false); });
+
+const safeHref = u => /^https?:\/\/\S+$/i.test(u || '') ? u : '';
+function annBlock() {
+  if (!anns.length) return '';
+  const list = showAllAnn ? anns : anns.slice(0, 2);
+  return `<h2 class="sec"><span><span class="serif">Annonces</span></span>${anns.length > 2 ? `<button data-act="annmore">${showAllAnn ? 'Réduire' : 'Voir tout'}</button>` : ''}</h2>
+    <div class="anns">${list.map(a => `<div class="ann"><div class="ad">${esc(fmtDate(a.date))}</div><b>${esc(a.title)}</b><p>${esc(a.body)}</p>${safeHref(a.url) ? `<a href="${esc(safeHref(a.url))}" target="_blank" rel="noopener">En savoir plus ↗</a>` : ''}</div>`).join('')}</div>`;
+}
+
+/* ---------- NOTIFICATIONS D'ANNONCES ---------- */
+const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+const b64ToU8 = s => { const p = '='.repeat((4 - s.length % 4) % 4); return Uint8Array.from(atob((s + p).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)); };
+const postJSON = (p, method, body) => fetch(FN(p), { method, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+async function refreshPushState() {
+  if (!pushSupported) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    pushOn = !!sub && Notification.permission === 'granted';
+    // on renouvelle l'inscription au plus une fois par jour (le téléphone peut changer de clé)
+    if (pushOn && Date.now() - LS.get('sc_pushsync', 0) > 864e5 && online()) {
+      const r = await postJSON('subscribe', 'POST', { subscription: sub.toJSON() }).catch(() => null);
+      if (r && r.ok) LS.set('sc_pushsync', Date.now());
+    }
+  } catch { pushOn = false; }
+  render();
+}
+async function enablePush() {
+  if (isIOS && !standalone()) { toast('Sur iPhone : installe d\'abord l\'application (Partager, puis « Sur l\'écran d\'accueil »)'); return; }
+  if (!pushSupported) { toast('Ce navigateur ne gère pas les notifications'); return; }
+  if (!online()) { toast('Connecte-toi à internet pour activer les notifications'); return; }
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') { toast('Notifications refusées : tu pourras les autoriser dans les réglages du navigateur'); render(); return; }
+  try {
+    const kr = await fetch(FN('push-key'));
+    if (!kr.ok) throw 0;
+    const { publicKey } = await kr.json();
+    const reg = await navigator.serviceWorker.ready;
+    const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(publicKey) });
+    const r = await postJSON('subscribe', 'POST', { subscription: sub.toJSON() });
+    if (!r.ok) throw 0;
+    pushOn = true; LS.set('sc_pushsync', Date.now()); toast('Notifications activées');
+  } catch { toast('Impossible d\'activer les notifications pour le moment'); }
+  render();
+}
+async function disablePush() {
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) { await postJSON('subscribe', 'DELETE', { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); }
+  } catch {}
+  pushOn = false; toast('Notifications désactivées'); render();
+}
+function notifRow() {
+  if (!pushSupported) return '';
+  const st = Notification.permission === 'denied' ? 'Bloquées' : pushOn ? 'Activées' : 'Désactivées';
+  return `<button data-act="pushtoggle"><span>Notifications des annonces</span><span class="v">${st}</span></button>`;
+}
+function pushBanner() {
+  if (!pushSupported || pushOn || LS.get('sc_nopush', false) || Notification.permission === 'denied') return '';
+  if (isIOS && !standalone()) return '';   // sur iPhone, il faut d'abord installer l'application
+  return `<div class="install"><p>Reçois les annonces de l'église directement sur ton téléphone.</p><button class="btn" data-act="pushon">Activer</button><button class="x" data-act="nopush" aria-label="Fermer">✕</button></div>`;
+}
+
 async function refreshApp() {
   toast('Mise à jour…');
   try {
@@ -445,7 +552,7 @@ async function refreshApp() {
   setTimeout(() => location.reload(), 600);
 }
 function syncOnline() { document.body.classList.toggle('off', !online()); updateSeg(); }
-addEventListener('online', () => { syncOnline(); loadCatalog(); });
+addEventListener('online', () => { syncOnline(); loadCatalog().then(() => syncRemote(true)); });
 addEventListener('offline', syncOnline);
 
 /* ---------- TÉLÉCHARGEMENT HORS LIGNE ---------- */
@@ -813,7 +920,8 @@ $('#save').onclick = async () => {
 /* ---------- DÉMARRAGE ---------- */
 syncOnline();
 render();
-loadCatalog();
+loadCatalog().then(() => syncRemote(true));
+refreshPushState();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
 </body>

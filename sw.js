@@ -2,8 +2,8 @@
    - L'appli (index, icônes, manifest) est gardée en cache : elle s'ouvre sans réseau.
    - sermons.json : réseau d'abord, sinon la dernière copie.
    - Audio et transcriptions : gérés par l'appli elle-même (téléchargement volontaire). */
-const V = 'sc-shell-v4';
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'sermons.json'];
+const V = 'sc-shell-v5';
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/logo-mark.png', 'sermons.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -44,6 +44,7 @@ self.addEventListener('fetch', e => {
     return;
   }
   if (url.origin !== location.origin) return;                 // YouTube, miniatures, etc. : on ne touche à rien
+  if (url.pathname.startsWith('/.netlify/') || url.pathname.endsWith('/admin.html')) return;   // fonctions du serveur et page d'administration : toujours en direct
   if (/\/(audio|transcripts)\//.test(url.pathname)) return;   // gérés par l'appli
 
   if (url.pathname.endsWith('/sermons.json')) { e.respondWith(networkFirst(req)); return; }
@@ -52,4 +53,28 @@ self.addEventListener('fetch', e => {
     return;
   }
   e.respondWith(staleWhileRevalidate(req));
+});
+
+/* ---------- notifications d'annonces ---------- */
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Soleil Couchant', {
+    body: d.body || '',
+    icon: 'icons/icon-192.png',
+    badge: 'icons/icon-192.png',
+    tag: d.id ? 'annonce-' + d.id : undefined,
+    lang: 'fr'
+  }));
+});
+
+// Toucher la notification ouvre l'application (l'annonce s'y trouve, avec son éventuel lien).
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const c of list) if ('focus' in c) return c.focus();
+      return self.clients.openWindow(self.registration.scope);
+    })
+  );
 });

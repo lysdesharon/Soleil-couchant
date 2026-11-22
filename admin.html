@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0a1020">
+<title>Annonces · Soleil Couchant</title>
+<style>
+:root{--bg:#0a1020;--card:#131d36;--line:#22304f;--text:#f2f4fa;--muted:#8d9ab8;--gold:#e9b24c;--gold2:#f6cf7d;--ink:#1a1204;--ok:#5ac28a;--bad:#ff8f8f;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:520px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom))}
+h1{font-size:21px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 20px;line-height:1.5}
+label{display:block;font-size:13px;color:var(--muted);margin:16px 0 6px;font-weight:600}
+input,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:15px}
+textarea{min-height:130px;resize:vertical;line-height:1.5}
+.count{float:right;font-weight:400}
+button{font:inherit;border:0;cursor:pointer}
+.btn{width:100%;margin-top:20px;background:var(--gold);color:var(--ink);font-weight:700;padding:15px;border-radius:999px;font-size:16px}
+.btn.confirm{background:#d9534f;color:#fff}
+.btn:disabled{opacity:.5}
+.link{background:none;color:var(--muted);font-size:13px;margin-top:10px;text-decoration:underline}
+.box{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.5;margin-top:16px}
+.box.ok{border-color:#5ac28a88;color:var(--ok)}
+.box.bad{border-color:#ff8f8f88;color:var(--bad)}
+.stat{display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;color:var(--muted)}
+.stat b{color:var(--gold2)}
+h2{font-size:15px;margin:28px 0 8px}
+.past{border-top:1px solid var(--line);padding:12px 0;display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.past b{display:block;font-size:14px}.past small{color:var(--muted);font-size:12px;display:block;margin-top:2px;line-height:1.4}
+.past button{background:none;color:var(--bad);font-size:13px;padding:4px 0;flex:none}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <h1>Annonces de l'église</h1>
+  <p class="sub">Ce que tu écris ici apparaît dans l'application et part en notification sur les téléphones qui les ont activées.</p>
+
+  <div id="stat" class="stat" hidden><span>Téléphones inscrits</span><b id="subs">0</b></div>
+
+  <label for="code">Code administrateur</label>
+  <input id="code" type="password" autocomplete="current-password" placeholder="Le code défini sur Netlify">
+
+  <label for="title">Titre <span class="count" id="ct">0/80</span></label>
+  <input id="title" maxlength="80" placeholder="Ex. Culte spécial dimanche">
+
+  <label for="body">Message <span class="count" id="cb">0/400</span></label>
+  <textarea id="body" maxlength="400" placeholder="Ex. Rejoignez-nous dimanche à 9h pour un culte de louange."></textarea>
+
+  <label for="url">Lien (facultatif)</label>
+  <input id="url" type="url" inputmode="url" placeholder="https://…">
+
+  <button class="btn" id="send">Envoyer l'annonce</button>
+  <div id="msg" class="box" hidden></div>
+
+  <h2>Dernières annonces</h2>
+  <div id="past"><small style="color:var(--muted)">Entre ton code pour les voir.</small></div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const FN = p => '/.netlify/functions/' + p;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let armed = false, armTimer = null;
+try { $('#code').value = localStorage.getItem('sc_admin') || ''; } catch {}
+
+function say(t, kind) { const m = $('#msg'); m.hidden = !t; m.textContent = t || ''; m.className = 'box ' + (kind || ''); }
+function count() { $('#ct').textContent = $('#title').value.length + '/80'; $('#cb').textContent = $('#body').value.length + '/400'; }
+$('#title').oninput = $('#body').oninput = count;
+
+async function api(path, method, body) {
+  const r = await fetch(FN(path), { method, headers: { 'content-type': 'application/json', 'x-admin-code': $('#code').value.trim() }, body: body ? JSON.stringify(body) : undefined });
+  let j = {}; try { j = await r.json(); } catch {}
+  return { ok: r.ok, status: r.status, data: j };
+}
+async function refresh() {
+  if (!$('#code').value.trim()) return;
+  const r = await api('status', 'GET');
+  if (r.data.adminConfigured === false) { say('Le code administrateur n\'est pas encore configuré sur Netlify (variable ADMIN_CODE, 8 caractères minimum). Voir le guide.', 'bad'); return; }
+  if (!r.data.authorized) { $('#stat').hidden = true; return; }
+  try { localStorage.setItem('sc_admin', $('#code').value.trim()); } catch {}
+  $('#stat').hidden = false; $('#subs').textContent = r.data.subscribers;
+  const list = r.data.announcements || [];
+  $('#past').innerHTML = list.length ? list.map(a => `<div class="past"><div><b>${esc(a.title)}</b><small>${esc(new Date(a.date).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' }))} · ${esc(a.body.slice(0, 90))}${a.body.length > 90 ? '…' : ''}</small></div><button data-del="${esc(a.id)}">Retirer</button></div>`).join('') : '<small style="color:var(--muted)">Aucune annonce pour le moment.</small>';
+}
+$('#code').addEventListener('change', refresh);
+
+$('#send').onclick = async () => {
+  const b = $('#send');
+  if (!$('#code').value.trim() || !$('#title').value.trim() || !$('#body').value.trim()) { say('Remplis le code, le titre et le message.', 'bad'); return; }
+  if (!armed) {   // première pression : on demande confirmation
+    armed = true; b.textContent = 'Confirmer : envoyer à tout le monde'; b.classList.add('confirm');
+    armTimer = setTimeout(reset, 6000); return;
+  }
+  clearTimeout(armTimer); b.disabled = true; b.textContent = 'Envoi…'; say('');
+  const r = await api('announce', 'POST', { title: $('#title').value, body: $('#body').value, url: $('#url').value });
+  b.disabled = false; reset();
+  if (!r.ok) { say(r.data.error || 'L\'envoi a échoué. Réessaie.', 'bad'); return; }
+  const d = r.data;
+  say(`Annonce publiée. Notification envoyée à ${d.sent} téléphone${d.sent > 1 ? 's' : ''}` + (d.total ? ` sur ${d.total} inscrit${d.total > 1 ? 's' : ''}` : '') + (d.failed ? ` · ${d.failed} échec(s)` : '') + (d.skipped ? ` · ${d.skipped} non envoyé(s), réessaie plus tard` : '') + '.', 'ok');
+  $('#title').value = $('#body').value = $('#url').value = ''; count(); refresh();
+};
+function reset() { armed = false; const b = $('#send'); b.textContent = 'Envoyer l\'annonce'; b.classList.remove('confirm'); }
+
+$('#past').addEventListener('click', async e => {
+  const id = e.target.dataset && e.target.dataset.del; if (!id) return;
+  e.target.disabled = true;
+  const r = await api('announce', 'DELETE', { id });
+  say(r.ok ? 'Annonce retirée de l\'application. Les notifications déjà envoyées ne peuvent pas être rappelées.' : (r.data.error || 'Échec.'), r.ok ? 'ok' : 'bad');
+  refresh();
+});
+count(); refresh();
+</script>
+</body>
+</html>

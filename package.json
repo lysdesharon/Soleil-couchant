@@ -1,0 +1,11 @@
+{
+  "name": "soleil-couchant",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Soleil Couchant : prédications du pasteur Francis Tinona",
+  "dependencies": {
+    "@netlify/blobs": "8.1.0",
+    "web-push": "3.6.7"
+  }
+}

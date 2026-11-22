@@ -49,3 +49,9 @@ Ouvrons nos Bibles ensemble.
 ## Mise en ligne
 
 Ajouter les fichiers dans le dépôt GitHub (dossiers `audio/` et `transcripts/`, puis la ligne dans `sermons.json`). Netlify republie le site automatiquement en une minute.
+
+## Nouvelles vidéos : elles arrivent toutes seules
+
+Les nouvelles vidéos de la chaîne YouTube sont ajoutées automatiquement dans l'application (voir `GUIDE-ADMINISTRATION.md`). Il n'est donc pas nécessaire de les copier ici. On n'ajoute une ligne dans `sermons.json` que pour une prédication qui doit avoir un audio ou un texte : on reprend alors le même identifiant `yt`, et l'application la fusionne avec la vidéo.
+
+Les fichiers de sous-titres `.srt` sont aussi acceptés pour le texte, en plus de `.vtt`.
